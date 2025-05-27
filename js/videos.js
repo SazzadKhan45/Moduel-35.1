@@ -3,9 +3,8 @@ function getTimeString (times){
     const hours = parseInt(times / 3600);
     const remindSecondByHours = (hours % 3600);
     const minute = parseInt(remindSecondByHours / 60);
-    const second = minute % 60;
-
-    return `${hours} Hours ${minute} Minute ${second} Second ago`
+    
+    return `${hours} Hours ${minute} Minute ago`
 };
 
 
@@ -18,6 +17,19 @@ const loadCategoryData = () => {
         .catch(error => console.log(error))
 };
 
+// Load all videos function by all btn click
+const allVideoBtnClick = () =>{
+    loadVideoData();
+}
+
+// Load videos function by click category btn
+const loadVideos = (id) =>{
+        fetch (`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
+        .then(res => res.json())
+        .then(data => loadDisplayVideos(data.category))
+        .catch(error => console.log(error))
+}
+
 // loadData show the display
 
 const loadDisplayData = (categoryDatas) => {
@@ -25,10 +37,13 @@ const loadDisplayData = (categoryDatas) => {
     for(const showData of categoryDatas){
         // console.log(showData);
         // craete a button
-        const button = document.createElement('button');
-        button.classList = "btn text-lg font-semibold md:px-6";
-        button.innerText = showData.category;
-        loadBtnCategory.appendChild(button);
+        const buttonContainer = document.createElement('div');
+        buttonContainer.innerHTML = `
+            <button onclick="loadVideos(${showData.category_id})" class ="btn text-lg font-semibold md:px-6">
+                ${showData.category}
+            </button>
+        `;
+        loadBtnCategory.appendChild(buttonContainer);
     }
 };
 
@@ -40,11 +55,29 @@ const loadVideoData = () => {
         .catch(error => console.log(error))
 };
 
+
+
 // All videos show display
 const loadDisplayVideos = (allVideos) => {
     const showAllVideos = document.getElementById('video-container');
+    showAllVideos.innerHTML = "";
+
+    if(allVideos.length === 0){
+        showAllVideos.classList.remove('grid');
+        showAllVideos.innerHTML = `
+            <div class ="md:min-h-[300px] flex flex-col justify-center items-center gap-6 mt-12 md:mt-40">
+                <img class ="w-[250px] md:w-[300px] mb-8 mx-auto" src="assets/Icon.png"/>
+                <h2 class ="text-3xl font-bold ">Oops!! Sorry, There is no<br>content here</h2>
+            </div>
+        `;
+        return;
+    }
+    else{
+        showAllVideos.classList.add('grid');
+    }
+
     for(const video of allVideos){
-        console.log(video);
+        // console.log(video);
 
         const div = document.createElement('div');
         div.classList = " ";
